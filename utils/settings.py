@@ -17,9 +17,6 @@ DATABASE_MODELS = [
     'math_mini_guide.models'
 ]
 
-MODELS = [
-    'aerich.models'
-]
 
 TORTOISE_ORM = {
     'connections': {
@@ -29,7 +26,7 @@ TORTOISE_ORM = {
     },
     'apps': {
         'models': {
-            'models': MODELS.extend(DATABASE_MODELS),
+            'models': ['aerich.models'] + DATABASE_MODELS,
             'default_connection': 'default'
         }
     }
