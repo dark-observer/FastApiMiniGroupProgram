@@ -2,7 +2,7 @@ DB_CONF = {
     'host': 'localhost',
     'port': '5432',
     'user': 'postgres',
-    'password': '123456',
+    'password': 'Cr1yCarq1hR4DddYM76y',
     'database': 'math_mini_guide',
 }
 
