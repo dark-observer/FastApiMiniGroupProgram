@@ -1,8 +1,10 @@
+import os
+
 DB_CONF = {
     'host': 'localhost',
     'port': '5432',
     'user': 'postgres',
-    'password': 'Cr1yCarq1hR4DddYM76y',
+    'password': os.getenv('DB_PASSWORD', '123456'),
     'database': 'math_mini_guide',
 }
 
@@ -16,7 +18,6 @@ DATABASE = {
 DATABASE_MODELS = [
     'math_mini_guide.models'
 ]
-
 
 TORTOISE_ORM = {
     'connections': {

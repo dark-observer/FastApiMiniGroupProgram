@@ -78,3 +78,15 @@ async def post_wechat_user(pk: int, wechat_user: PydanticWechatUser):
     else:
         wechat_user = await WechatUser.create(**data)
     return wechat_user
+
+
+@router.get('/test-amis')
+async def test_amis():
+    return {
+        "status": 0,
+        "msg": "",
+        "data": {
+            "title": "Test Page Component",
+            "date": "2017-10-13"
+        }
+    }
