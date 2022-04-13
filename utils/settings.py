@@ -1,4 +1,7 @@
 import os
+from pathlib import Path
+
+BASE_DIR = Path(__file__).parent.parent.absolute()
 
 DB_CONF = {
     'host': 'localhost',

@@ -1,7 +1,6 @@
-from tortoise import fields, Model, Tortoise
-from tortoise.contrib.pydantic import pydantic_model_creator
+from tortoise import fields, Model
 
-from utils.reference import AbstractBaseModel, random_string, b64encode
+from utils.reference import AbstractBaseModel, b64encode, random_string
 
 
 class Area(AbstractBaseModel):
@@ -23,6 +22,12 @@ class WechatUser(Model):
     id = fields.IntField(pk=True)
     open_id = fields.CharField(description="OpenID", max_length=50, unique=True)
     signature = fields.CharField(description="签名", max_length=50)
+
+    def save(self, *args, **kwargs):
+        if not self.signature:
+            self.signature = random_string()
+
+        super().save(*args, **kwargs)
 
     def token(self):
         return f"{b64encode(self.open_id)}.{b64encode(self.signature)}"

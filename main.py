@@ -1,11 +1,11 @@
 from fastapi import FastAPI
-from fastapi.requests import Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.templating import Jinja2Templates
+from fastapi.staticfiles import StaticFiles
 from tortoise.contrib.fastapi import register_tortoise
 
-from utils.settings import DATABASE, DATABASE_MODELS, CORS_ALLOW_ORIGINS
-
 from math_mini_guide.router import router as math_mini_guide_router
+from utils.settings import DATABASE, DATABASE_MODELS, CORS_ALLOW_ORIGINS, BASE_DIR
 
 app = FastAPI()
 
@@ -19,6 +19,11 @@ app.add_middleware(
 )
 
 app.include_router(math_mini_guide_router)
+
+# 静态文件挂载目录
+app.mount('/amis', StaticFiles(directory=BASE_DIR.joinpath('admin').joinpath('amis')), name='amis')
+# 模板文件挂载目录
+admin_template = Jinja2Templates(directory=BASE_DIR.joinpath('admin'))
 
 # 所有应用的model注册到数据库
 register_tortoise(
@@ -35,3 +40,9 @@ register_tortoise(
     },
     generate_schemas=True
 )
+
+
+
+@app.route('/admin')
+async def admin_index(request):
+    return admin_template.TemplateResponse('index.html', {'request': request})

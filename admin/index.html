@@ -35,11 +35,85 @@
     (function () {
         let amis = amisRequire('amis/embed');
         // 通过替换下面这个配置来生成不同页面
-        let amisJSON = {
-            "type": "page",
-            "initApi": "http://localhost:8000/test-amis",
-            "body": "date is ${date}"
-        }
+        let areaFormJson = [
+            {
+                "type": "input-text",
+                "name": "name",
+                "label": "领域名"
+            },
+            {
+                "type": "input-number",
+                "name": "no",
+                "label": "序号"
+            }
+        ]
+        let amisJSON = [
+            {
+                "label": "新增",
+                "type": "button",
+                "actionType": "dialog",
+                "level": "primary",
+                "className": "m-b-sm",
+                "dialog": {
+                    "title": "新增",
+                    "body": {
+                        "type": "form",
+                        "api": "post:/post-area/0",
+                        "body": areaFormJson
+                    }
+                }
+            },
+            {
+                "type": "page",
+                "body": {
+                    "type": "crud",
+                    "api": "/admin-area",
+                    "syncLocation": false,
+                    "columns": [
+                        {
+                            "name": "id",
+                            "label": "ID"
+                        },
+                        {
+                            "name": "name",
+                            "label": "名称"
+                        },
+                        {
+                            "name": "no",
+                            "label": "序号"
+                        },
+                        {
+                            "type": "operation",
+                            "label": "操作",
+                            "buttons": [
+                                {
+                                    "label": "删",
+                                    "type": "button",
+                                    "actionType": "ajax",
+                                    "level": "danger",
+                                    "confirmText": "确认要删除？",
+                                    "api": "delete:/admin-area-delete/${id}"
+                                },
+                                {
+                                    "label": "改",
+                                    "type": "button",
+                                    "actionType": "drawer",
+                                    "drawer": {
+                                        "title": "新增表单",
+                                        "body": {
+                                            "type": "form",
+                                            "initApi": "/admin-area/${id}",
+                                            "api": "post:/post-area/${id}",
+                                            "body": areaFormJson
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        ]
         amis.embed('#root', amisJSON)
         //let amisScoped = amis.embed('#root', amisJSON);
     })();

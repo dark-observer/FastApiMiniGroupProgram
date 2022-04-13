@@ -2,3 +2,5 @@ fastapi
 tortoise-orm[asyncpg]
 uvicorn
 aerich
+orjson
+fastapi-pagination[all]

@@ -1,6 +1,10 @@
+import math
+import httpx
+
 from fastapi import APIRouter
 from tortoise.models import Q
 from starlette.requests import Request
+from fastapi.responses import ORJSONResponse
 
 from math_mini_guide.models import Area, Catalogue, Article, WechatUser
 from math_mini_guide.pydantics import PydanticArea, PydanticCatalogue, PydanticArticle, PydanticWechatUser
@@ -8,23 +12,22 @@ from math_mini_guide.pydantics import PydanticArea, PydanticCatalogue, PydanticA
 router = APIRouter()
 
 
-@router.get('/full-area')
+@router.get('/full-area', response_class=ORJSONResponse)
 async def full_area():
     return await Area.all()
 
 
-@router.post('/post-area/<pk>')
+@router.post('/post-area/{pk}', response_class=ORJSONResponse)
 async def post_area(pk: int, area: PydanticArea):
-    data = area.dict()
-    if pk:
-        area = await Area.get(pk=pk)
-        await area.update_from_dict(data)
-    else:
-        area = await Area.create(**data)
-    return area
+    await Area.update_or_create(area.dict(), pk=pk)
+    return {
+        'status': 0,
+        'msg': '',
+        'data': area
+    }
 
 
-@router.get('/full-catalogue')
+@router.get('/full-catalogue', response_class=ORJSONResponse)
 async def full_catalogue(request: Request):
     q = Q()
     if area := request.query_params.get('area'):
@@ -32,18 +35,13 @@ async def full_catalogue(request: Request):
     return await Catalogue.filter(q)
 
 
-@router.post('/post-catalogue/<pk>')
+@router.post('/post-catalogue/{pk}', response_class=ORJSONResponse)
 async def post_catalogue(pk: int, catalogue: PydanticCatalogue):
-    data = catalogue.dict()
-    if pk:
-        catalogue = await Catalogue.get(id=pk)
-        await catalogue.update_from_dict(data)
-    else:
-        catalogue = await Catalogue.create(**data)
+    await Catalogue.update_or_create(catalogue.dict(), pk=pk)
     return catalogue
 
 
-@router.get('/full-article')
+@router.get('/full-article', response_class=ORJSONResponse)
 async def full_article(request: Request):
     q = Q()
     if area := request.query_params.get('area'):
@@ -53,7 +51,7 @@ async def full_article(request: Request):
     return await Article.filter(q)
 
 
-@router.post('/post-article/<pk>')
+@router.post('/post-article/{pk}', response_class=ORJSONResponse)
 async def post_article(pk: int, article: PydanticArticle):
     data = article.dict()
     if pk:
@@ -64,12 +62,12 @@ async def post_article(pk: int, article: PydanticArticle):
     return article
 
 
-@router.get('/full-wechat_user')
+@router.get('/full-wechat_user', response_class=ORJSONResponse)
 async def full_wechat_user():
     return await WechatUser.all()
 
 
-@router.post('/post-wechat_user/<pk>')
+@router.post('/post-wechat_user/{pk}', response_class=ORJSONResponse)
 async def post_wechat_user(pk: int, wechat_user: PydanticWechatUser):
     data = wechat_user.dict()
     if pk:
@@ -80,13 +78,38 @@ async def post_wechat_user(pk: int, wechat_user: PydanticWechatUser):
     return wechat_user
 
 
-@router.get('/test-amis')
-async def test_amis():
+@router.get('/admin-area', response_class=ORJSONResponse)
+async def admin_area(page: int, perPage: int):
+    data = await Area.all().order_by('no')
     return {
-        "status": 0,
-        "msg": "",
-        "data": {
-            "title": "Test Page Component",
-            "date": "2017-10-13"
+        'status': 0,
+        'msg': '',
+        'data': {
+            'count': len(data),
+            'rows': [
+                {'id': d.id, 'name': d.name, 'no': d.no}
+                for d in data[(page - 1) * perPage:page * perPage]
+            ]
         }
+    }
+
+
+@router.delete('/admin-area-delete/{pk}', response_class=ORJSONResponse)
+async def admin_area_delete(pk: int):
+    data = await Area.get(id=pk)
+    await data.delete()
+    return {
+        'status': 0,
+        'msg': '',
+        'data': data
+    }
+
+
+@router.get('/admin-area/{pk}', response_class=ORJSONResponse)
+async def admin_area_detail(pk: int):
+    data = await Area.get(id=pk)
+    return {
+        'status': 0,
+        'msg': '',
+        'data': data
     }

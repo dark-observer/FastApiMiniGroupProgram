@@ -1,8 +1,6 @@
 from typing import Optional
 from pydantic import BaseModel
 
-from utils.reference import random_string
-
 
 class PydanticArea(BaseModel):
     name: str
@@ -24,9 +22,4 @@ class PydanticArticle(BaseModel):
 
 class PydanticWechatUser(BaseModel):
     open_id = str
-    signature: Optional[str] = random_string()
-
-# class WechatUser(Model):
-#     id = fields.IntField(pk=True)
-#     open_id = fields.CharField(description="OpenID", max_length=50, unique=True)
-#     signature = fields.CharField(description="签名", max_length=50, default=random_string())
+    signature: Optional[str] = ''
