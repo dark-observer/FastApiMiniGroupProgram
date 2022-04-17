@@ -1,6 +1,3 @@
-import math
-import httpx
-
 from fastapi import APIRouter
 from tortoise.models import Q
 from starlette.requests import Request
@@ -76,40 +73,3 @@ async def post_wechat_user(pk: int, wechat_user: PydanticWechatUser):
     else:
         wechat_user = await WechatUser.create(**data)
     return wechat_user
-
-
-@router.get('/admin-area', response_class=ORJSONResponse)
-async def admin_area(page: int, perPage: int):
-    data = await Area.all().order_by('no')
-    return {
-        'status': 0,
-        'msg': '',
-        'data': {
-            'count': len(data),
-            'rows': [
-                {'id': d.id, 'name': d.name, 'no': d.no}
-                for d in data[(page - 1) * perPage:page * perPage]
-            ]
-        }
-    }
-
-
-@router.delete('/admin-area-delete/{pk}', response_class=ORJSONResponse)
-async def admin_area_delete(pk: int):
-    data = await Area.get(id=pk)
-    await data.delete()
-    return {
-        'status': 0,
-        'msg': '',
-        'data': data
-    }
-
-
-@router.get('/admin-area/{pk}', response_class=ORJSONResponse)
-async def admin_area_detail(pk: int):
-    data = await Area.get(id=pk)
-    return {
-        'status': 0,
-        'msg': '',
-        'data': data
-    }
