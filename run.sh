@@ -7,4 +7,4 @@ VIR=venv
 cd /home/ubuntu/code/FastApiMiniGroupProgram
 source $VIR/bin/activate
 
-exec $VIR/bin/nvicorn main:app --host $HOST --port $PORT --reload
+exec $VIR/bin/uvicorn main:app --host $HOST --port $PORT --reload
