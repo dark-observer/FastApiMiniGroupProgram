@@ -4,7 +4,7 @@ from pathlib import Path
 BASE_DIR = Path(__file__).parent.parent.absolute()
 
 DB_CONF = {
-    'host': 'localhost',
+    'host': os.getenv('DB_HOST', 'localhost'),
     'port': '5432',
     'user': 'postgres',
     'password': os.getenv('DB_PASSWORD', '123456'),
