@@ -1,5 +1,8 @@
 from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 from tortoise.contrib.fastapi import register_tortoise
 
 from math_mini_guide.router import router as math_mini_guide_router
@@ -15,6 +18,9 @@ WHITELIST = [
 
 app = FastAPI()
 
+app.mount('/static', StaticFiles(directory='static'), name='static')
+Template = Jinja2Templates(directory='templates')
+
 # 解决跨域
 app.add_middleware(
     CORSMiddleware,
@@ -27,20 +33,20 @@ app.add_middleware(
 app.include_router(math_mini_guide_router)
 app.include_router(admin_router)
 
-
-@app.middleware('http')
-async def add_process_time_header(request: Request, call_next):
-    for white_list in WHITELIST:
-        if request.url.path.startswith(white_list):
-            return await call_next(request)
-
-    if token := request.headers.get('Token'):
-        payload, signature = token.split('.')
-        count = await WechatUser.filter(open_id=b64encode(payload), signature=b64encode(signature)).count()
-        if count > 0:
-            return await call_next(request)
-
-    return Response('身份未验证'.encode('GB18030'))
+# @app.middleware('http')
+# async def add_process_time_header(request: Request, call_next):
+#     print(request.url.path)
+#     for white_list in WHITELIST:
+#         if request.url.path.startswith(white_list):
+#             return await call_next(request)
+#
+#     if token := request.headers.get('Token'):
+#         payload, signature = token.split('.')
+#         count = await WechatUser.filter(open_id=b64encode(payload), signature=b64encode(signature)).count()
+#         if count > 0:
+#             return await call_next(request)
+#
+#     return Response('身份未验证'.encode('GB18030'))
 
 
 # 所有应用的model注册到数据库
@@ -58,3 +64,8 @@ register_tortoise(
     },
     generate_schemas=True
 )
+
+
+@app.get('/admin/test', response_class=HTMLResponse)
+async def test(request: Request):
+    return Template.TemplateResponse('index.html', {'request': request, 'test': id})
